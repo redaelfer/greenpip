@@ -1,0 +1,86 @@
+name: CI - optimized
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  changed:
+    name: Detect changed files
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+      tests: ${{ steps.filter.outputs.tests }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check changed paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with: |
+          src: 
+            - 'src/**'
+            - '*.py'
+          tests:
+            - 'tests/**'
+            - 'tests/*.py'
+
+  tests:
+    name: Run tests (Windows runner)
+    runs-on: windows-latest
+    needs: changed
+    if: needs.changed.outputs.src == 'true' || needs.changed.outputs.tests == 'true'
+    env:
+      PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python (with pip cache)
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Create pip cache env
+        run: echo "PIP_CACHE_DIR=${{ runner.temp }}/pip-cache" >> $GITHUB_ENV
+
+      - name: Restore pip cache (fallback)
+        uses: actions/cache@v3
+        with:
+          path: ${{ runner.temp }}/pip-cache
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Restore testmon DB
+        uses: actions/cache@v4
+        with:
+          path: .testmondata
+          key: ${{ runner.os }}-testmon-${{ hashFiles('**/*.py') }}
+          restore-keys: |
+            ${{ runner.os }}-testmon-
+
+      - name: Install dependencies (fast)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --cache-dir ${{ runner.temp }}/pip-cache -r requirements-dev.txt
+        shell: bash
+
+      - name: Run tests with measurement
+        run: python tools/measure_and_test.py --junit report.xml
+        shell: bash
+
+      - name: Save testmon DB
+        if: always()
+        uses: actions/cache@v4
+        with:
+          path: .testmondata
+          key: ${{ runner.os }}-testmon-${{ hashFiles('.testmondata') }}-${{ github.run_id }}
+
+      - name: Upload test report & metrics
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            report.xml
+            metrics.json

@@ -1,0 +1,6 @@
+pytest
+psutil
+pytest-testmon
+pytest-xdist
+pandas
+matplotlib
