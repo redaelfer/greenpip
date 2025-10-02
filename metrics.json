@@ -1,18 +1,18 @@
 {
-  "elapsed_s": 2.1676714420318604,
-  "avg_cpu_percent": 42.15,
-  "peak_mem_bytes": 71876608,
+  "elapsed_s": 2.0929524898529053,
+  "avg_cpu_percent": 45.25,
+  "peak_mem_bytes": 71938048,
   "samples": [
     {
-      "t": 1759441998.1942506,
-      "cpu_percent": 84.3,
-      "mem_rss": 71876608
+      "t": 1759443156.8541348,
+      "cpu_percent": 87.4,
+      "mem_rss": 71938048
     },
     {
-      "t": 1759441999.29817,
-      "cpu_percent": 0.0,
-      "mem_rss": 21483520
+      "t": 1759443157.930309,
+      "cpu_percent": 3.1,
+      "mem_rss": 21594112
     }
   ],
-  "returncode": 2
+  "returncode": 0
 }

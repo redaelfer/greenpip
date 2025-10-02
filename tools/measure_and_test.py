@@ -11,7 +11,9 @@ def run_and_sample(junit_path="report.xml", sample_interval=0.5):
     # utilise la forme --junitxml=<file>
     cmd = ["pytest", f"--junitxml={junit_path}"]
     print("Running:", " ".join(cmd))
-    proc = subprocess.Popen(cmd)
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd() + (os.pathsep + env.get("PYTHONPATH","") if env.get("PYTHONPATH") else "")
+    proc = subprocess.Popen(cmd, env=env)
     time.sleep(0.05)
 
     samples = []
