@@ -1,0 +1,53 @@
+name: CI - baseline 
+
+# on peut lancer manuellement pour mesurer proprement
+on:
+  workflow_dispatch:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    name: Build and test (Windows - baseline)
+    runs-on: windows-latest
+    env:
+      # pas de pip cache ici — baseline installe tout à chaque fois
+      PIP_NO_CACHE_DIR: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          # PAS de cache: baseline réinstalle toujours
+          cache: 'none'
+
+      - name: Install dependencies (full install)
+        run: |
+          python -m pip install --upgrade pip
+          # installe tout, même les dev, sans cache
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+        shell: bash
+
+      - name: Ensure package installed (optional)
+        run: |
+          # si tu utilises installation editable pour imports, tu peux installer ici
+          if [ -f setup.cfg ] || [ -f pyproject.toml ]; then
+            pip install -e .
+          fi
+        shell: bash
+
+      - name: Run tests with measurement (baseline)
+        run: python tools/measure_and_test.py --junit report.xml --interval 0.5
+        shell: bash
+
+      - name: Upload artifacts (reports + metrics)
+        uses: actions/upload-artifact@v3
+        with:
+          name: baseline-test-results
+          path: |
+            report.xml
+            metrics.json

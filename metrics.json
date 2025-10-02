@@ -1,17 +1,17 @@
 {
-  "elapsed_s": 2.0929524898529053,
-  "avg_cpu_percent": 45.25,
-  "peak_mem_bytes": 71938048,
+  "elapsed_s": 2.173919439315796,
+  "avg_cpu_percent": 43.7,
+  "peak_mem_bytes": 71933952,
   "samples": [
     {
-      "t": 1759443156.8541348,
+      "t": 1759448696.1182058,
       "cpu_percent": 87.4,
-      "mem_rss": 71938048
+      "mem_rss": 71933952
     },
     {
-      "t": 1759443157.930309,
-      "cpu_percent": 3.1,
-      "mem_rss": 21594112
+      "t": 1759448697.2136464,
+      "cpu_percent": 0.0,
+      "mem_rss": 21913600
     }
   ],
   "returncode": 0
